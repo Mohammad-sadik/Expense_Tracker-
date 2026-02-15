@@ -35,7 +35,13 @@ initDb();
 
 // Routes
 app.use('/api/auth', authRoutes);
+app.use('/api/auth', authRoutes);
 app.use('/api/transactions', transactionRoutes);
+
+// Health Check Endpoint
+app.get('/api/health', (req, res) => {
+    res.status(200).json({ status: 'ok', message: 'Backend is running!', timestamp: new Date().toISOString() });
+});
 
 // Serve static files from the React app
 app.use(express.static(path.join(__dirname, '../../client/dist')));
