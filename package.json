@@ -5,9 +5,9 @@
     "main": "server/src/server.js",
     "scripts": {
         "start": "node server/src/server.js",
-        "build": "npm run install-server && cd client && npm install && npm run build",
+        "build": "npm run install-server && cd client && npm install --include=dev && npm run build",
         "install-server": "cd server && npm install",
-        "install-all": "npm run install-server && cd client && npm install",
+        "install-all": "npm run install-server && cd client && npm install --include=dev",
         "postinstall": "npm run build",
         "heroku-postbuild": "npm run install-server && npm run build"
     },
