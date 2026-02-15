@@ -1,26 +1,37 @@
-module.exports = (sequelize, DataTypes) => {
-    const User = sequelize.define('User', {
-        id: {
-            type: DataTypes.INTEGER,
-            primaryKey: true,
-            autoIncrement: true
-        },
-        name: {
-            type: DataTypes.STRING,
-            allowNull: false
-        },
-        email: {
-            type: DataTypes.STRING,
-            allowNull: false,
-            unique: true,
-            validate: {
-                isEmail: true
-            }
-        },
-        password: {
-            type: DataTypes.STRING,
-            allowNull: false
-        }
-    });
-    return User;
+const mongoose = require('mongoose');
+const bcrypt = require('bcrypt');
+
+const userSchema = mongoose.Schema({
+    name: {
+        type: String,
+        required: [true, 'Please add a name']
+    },
+    email: {
+        type: String,
+        required: [true, 'Please add an email'],
+        unique: true
+    },
+    password: {
+        type: String,
+        required: [true, 'Please add a password']
+    }
+}, {
+    timestamps: true
+});
+
+// Match user entered password to hashed password in database
+userSchema.methods.matchPassword = async function (enteredPassword) {
+    return await bcrypt.compare(enteredPassword, this.password);
 };
+
+// Encrypt password using bcrypt
+userSchema.pre('save', async function (next) {
+    if (!this.isModified('password')) {
+        next();
+    }
+
+    const salt = await bcrypt.genSalt(10);
+    this.password = await bcrypt.hash(this.password, salt);
+});
+
+module.exports = mongoose.module('User') || mongoose.model('User', userSchema);

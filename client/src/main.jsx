@@ -1,7 +1,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 import App from './App.jsx'
-import './assets/global.css'
+import './index.css'
 import axios from 'axios'
 
 // Set base URL for production depending on environment variable

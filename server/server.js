@@ -1,10 +1,13 @@
 const express = require('express');
 const cors = require('cors');
-const dotenv = require('dotenv');
 const morgan = require('morgan');
-const { sequelize } = require('./models');
+const dotenv = require('dotenv');
+const connectDB = require('./config/db');
 
 dotenv.config();
+
+// Connect to MongoDB
+connectDB();
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -24,13 +27,6 @@ const transactionRoutes = require('./routes/transactions');
 app.use('/api/auth', authRoutes);
 app.use('/api/transactions', transactionRoutes);
 
-app.listen(PORT, async () => {
+app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
-    try {
-        await sequelize.authenticate();
-        console.log('Database connected!');
-        await sequelize.sync(); // Sync models
-    } catch (err) {
-        console.error('Unable to connect to the database:', err);
-    }
 });

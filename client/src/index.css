@@ -1,0 +1,38 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom Base Styles (Using Tailwind @apply or standard CSS) */
+@layer base {
+    body {
+        @apply bg-background text-slate-800 font-sans antialiased;
+    }
+
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+        @apply font-heading font-bold text-slate-900;
+    }
+}
+
+/* Glassmorphism Utilities */
+@layer components {
+    .glass-panel {
+        @apply bg-white/80 backdrop-blur-md border border-white/20 shadow-xl;
+    }
+
+    .glass-card {
+        @apply bg-white/60 backdrop-blur-sm border border-white/40 shadow-sm hover:shadow-md transition-all duration-300;
+    }
+
+    .input-primary {
+        @apply w-full px-4 py-2 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary bg-white/50 backdrop-blur-sm transition-all;
+    }
+
+    .btn-primary {
+        @apply w-full py-3 px-4 bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-semibold rounded-xl shadow-lg shadow-indigo-500/30 hover:shadow-indigo-500/50 hover:-translate-y-0.5 transition-all duration-300;
+    }
+}
