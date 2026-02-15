@@ -71,7 +71,12 @@ const seedData = async () => {
         console.log(`Successfully inserted ${transactions.length} transactions for ${email}`);
     } catch (err) {
         console.error('Error inserting transactions:', err);
+        throw err; // Re-throw for API error handling
     }
 };
 
-seedData();
+if (require.main === module) {
+    seedData();
+}
+
+module.exports = { seedData };

@@ -42,6 +42,18 @@ app.get('/api/health', (req, res) => {
     res.status(200).json({ status: 'ok', message: 'Backend is running!', timestamp: new Date().toISOString() });
 });
 
+// Seeding Endpoint (Temporary for demo)
+const { seedData } = require('../seed');
+app.get('/api/seed', async (req, res) => {
+    try {
+        await seedData();
+        res.status(200).json({ status: 'ok', message: 'Database seeded successfully!' });
+    } catch (error) {
+        console.error('Seeding error:', error);
+        res.status(500).json({ status: 'error', message: 'Failed to seed database', error: error.message });
+    }
+});
+
 // Serve static files from the React app
 app.use(express.static(path.join(__dirname, '../../client/dist')));
 
