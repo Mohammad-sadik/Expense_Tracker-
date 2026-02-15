@@ -13,7 +13,7 @@ function App() {
         <AuthProvider>
             <TransactionProvider>
                 <Router>
-                    <div className="app-container">
+                    <div>
                         <Routes>
                             <Route path="/login" element={<Login />} />
                             <Route path="/register" element={<Register />} />

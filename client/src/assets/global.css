@@ -89,6 +89,7 @@ h6 {
 
 .auth-header h1 {
     background: var(--primary-gradient);
+    background-clip: text;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     font-size: 2.5rem;
@@ -159,6 +160,7 @@ h6 {
     font-size: 1.8rem;
     font-weight: 800;
     background: var(--primary-gradient);
+    background-clip: text;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     margin-bottom: 3rem;
@@ -286,6 +288,7 @@ h6 {
 
 .summary-card.balance .total-amount {
     background: var(--primary-gradient);
+    background-clip: text;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
 }
