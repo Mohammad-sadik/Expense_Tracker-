@@ -304,6 +304,10 @@ body {
     color: var(--success-color);
 }
 
+.expense-text {
+    color: var(--danger-color);
+}
+
 .category-badge {
     padding: 0.25rem 0.75rem;
     border-radius: 12px;

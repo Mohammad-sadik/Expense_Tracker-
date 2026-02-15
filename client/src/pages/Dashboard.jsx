@@ -70,8 +70,8 @@ const Dashboard = () => {
                                     <span className="t-date">{t.date}</span>
                                     <span className="t-title">{t.title}</span>
                                 </div>
-                                <div className={`t-amount ${t.category === 'Income' ? 'income-text' : ''}`}>
-                                    {t.category === 'Income' ? '+' : ''}₹{t.amount.toFixed(2)}
+                                <div className={`t-amount ${t.category === 'Income' ? 'income-text' : 'expense-text'}`}>
+                                    {t.category === 'Income' ? `+₹${t.amount.toFixed(2)}` : `-₹${Math.abs(t.amount).toFixed(2)}`}
                                 </div>
                             </div>
                         ))}
