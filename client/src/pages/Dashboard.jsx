@@ -40,11 +40,11 @@ const Dashboard = () => {
                 </div>
                 <div className="summary-card expense">
                     <h3>Total Expenses</h3>
-                    <p className="total-amount">₹{summary.totalExpenses.toFixed(2)}</p>
+                    <p className="total-amount">₹{Math.abs(summary.totalExpenses).toFixed(2)}</p>
                 </div>
                 <div className="summary-card balance">
                     <h3>Total Balance</h3>
-                    <p className="total-amount">₹{(parseFloat(summary.totalIncome) + parseFloat(summary.totalExpenses)).toFixed(2)}</p>
+                    <p className="total-amount">₹{(summary.totalIncome + summary.totalExpenses).toFixed(2)}</p>
                 </div>
             </div>
 
@@ -55,7 +55,7 @@ const Dashboard = () => {
                         {summary.categoryBreakdown.map((cat) => (
                             <div key={cat.category} className="category-card">
                                 <h4>{cat.category}</h4>
-                                <p>₹{parseFloat(cat.total).toFixed(2)}</p>
+                                <p>₹{Math.abs(parseFloat(cat.total)).toFixed(2)}</p>
                             </div>
                         ))}
                     </div>

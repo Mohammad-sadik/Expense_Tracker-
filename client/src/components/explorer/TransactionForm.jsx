@@ -27,7 +27,7 @@ const TransactionForm = ({ existingTransaction, onSuccess }) => {
 
         const transactionData = {
             title,
-            amount: parseFloat(amount),
+            amount: category === 'Income' ? parseFloat(amount) : -Math.abs(parseFloat(amount)),
             category,
             date,
             notes
