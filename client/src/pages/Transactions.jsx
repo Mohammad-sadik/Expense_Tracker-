@@ -147,13 +147,24 @@ const Transactions = () => {
                         onChange={handleFilterChange}
                         style={{ marginBottom: 0 }}
                     />
-                    <Input
+                    <select
                         name="category"
-                        placeholder="Category"
+                        className="input-field"
                         value={filters.category}
                         onChange={handleFilterChange}
-                        style={{ marginBottom: 0 }}
-                    />
+                        style={{ marginBottom: 0, fontFamily: 'inherit' }}
+                    >
+                        <option value="">All Categories</option>
+                        <option value="Basic Living">Basic Living</option>
+                        <option value="Transport">Transport</option>
+                        <option value="Shopping">Shopping</option>
+                        <option value="Lifestyle">Lifestyle</option>
+                        <option value="Health">Health</option>
+                        <option value="Growth">Growth</option>
+                        <option value="Work">Work</option>
+                        <option value="Financial">Financial</option>
+                        <option value="Other">Other</option>
+                    </select>
                     <Input
                         name="startDate"
                         type="date"
@@ -195,7 +206,7 @@ const Transactions = () => {
                                 transactions.map((t) => (
                                     <tr key={t.id}>
                                         <td style={{ fontWeight: 500 }}>{t.title}</td>
-                                        <td style={{ color: 'var(--text-secondary)' }}>${t.amount}</td>
+                                        <td style={{ color: 'var(--text-secondary)' }}>₹{t.amount}</td>
                                         <td style={{ color: 'var(--text-secondary)' }}>{t.category}</td>
                                         <td style={{ color: 'var(--text-secondary)' }}>{t.date}</td>
                                         <td style={{ textAlign: 'right' }}>

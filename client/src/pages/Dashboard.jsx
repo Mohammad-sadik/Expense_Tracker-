@@ -41,7 +41,7 @@ const Dashboard = () => {
                     </div>
                     <div>
                         <p style={{ fontSize: '0.875rem', fontWeight: 500, color: 'var(--text-secondary)' }}>Total Expenses</p>
-                        <p style={{ fontSize: '1.5rem', fontWeight: 600, color: 'var(--text-color)' }}>${data.total.toFixed(2)}</p>
+                        <p style={{ fontSize: '1.5rem', fontWeight: 600, color: 'var(--text-color)' }}>₹{data.total.toFixed(2)}</p>
                     </div>
                 </Card>
             </div>
@@ -93,7 +93,7 @@ const Dashboard = () => {
                                 {data.breakdown.map((item) => (
                                     <li key={item.category} className="flex-between" style={{ padding: '0.5rem 0', borderBottom: '1px solid #f3f4f6' }}>
                                         <span style={{ fontSize: '0.875rem', color: 'var(--text-secondary)' }}>{item.category}</span>
-                                        <span style={{ fontSize: '0.875rem', fontWeight: 'bold', color: 'var(--text-color)' }}>${item.total.toFixed(2)}</span>
+                                        <span style={{ fontSize: '0.875rem', fontWeight: 'bold', color: 'var(--text-color)' }}>₹{item.total.toFixed(2)}</span>
                                     </li>
                                 ))}
                             </ul>
