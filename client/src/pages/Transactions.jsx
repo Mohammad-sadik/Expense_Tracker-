@@ -147,24 +147,26 @@ const Transactions = () => {
                         onChange={handleFilterChange}
                         style={{ marginBottom: 0 }}
                     />
-                    <select
-                        name="category"
-                        className="input-field"
-                        value={filters.category}
-                        onChange={handleFilterChange}
-                        style={{ marginBottom: 0, fontFamily: 'inherit' }}
-                    >
-                        <option value="">All Categories</option>
-                        <option value="Basic Living">Basic Living</option>
-                        <option value="Transport">Transport</option>
-                        <option value="Shopping">Shopping</option>
-                        <option value="Lifestyle">Lifestyle</option>
-                        <option value="Health">Health</option>
-                        <option value="Growth">Growth</option>
-                        <option value="Work">Work</option>
-                        <option value="Financial">Financial</option>
-                        <option value="Other">Other</option>
-                    </select>
+                    <div className="input-group" style={{ marginBottom: 0 }}>
+                        <select
+                            name="category"
+                            className="input-field"
+                            value={filters.category}
+                            onChange={handleFilterChange}
+                            style={{ fontFamily: 'inherit' }}
+                        >
+                            <option value="">All Categories</option>
+                            <option value="Basic Living">Basic Living</option>
+                            <option value="Transport">Transport</option>
+                            <option value="Shopping">Shopping</option>
+                            <option value="Lifestyle">Lifestyle</option>
+                            <option value="Health">Health</option>
+                            <option value="Growth">Growth</option>
+                            <option value="Work">Work</option>
+                            <option value="Financial">Financial</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
                     <Input
                         name="startDate"
                         type="date"
