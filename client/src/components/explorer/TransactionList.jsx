@@ -103,8 +103,8 @@ const TransactionList = () => {
                         </div>
                         <div className="t-col t-title" title={t.title}>{t.title}</div>
                         <div className="t-col t-notes" title={t.notes}>{t.notes}</div>
-                        <div className={`t-col t-amount ${t.category === 'Income' ? 'income-text' : ''}`}>
-                            {t.category === 'Income' ? '+' : ''}₹{t.amount.toFixed(2)}
+                        <div className={`t-col t-amount ${t.category === 'Income' ? 'income-text' : 'expense-text'}`}>
+                            {t.category === 'Income' ? `+₹${t.amount.toFixed(2)}` : `-₹${t.amount.toFixed(2)}`}
                         </div>
                         <div className="t-col t-actions" style={{ textAlign: 'center' }}>
                             <button className="btn-icon edit" onClick={() => handleEdit(t)}>✎</button>
