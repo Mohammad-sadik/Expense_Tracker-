@@ -44,7 +44,7 @@ const Dashboard = () => {
                 </div>
                 <div className="summary-card balance">
                     <h3>Total Balance</h3>
-                    <p className="total-amount">₹{(parseFloat(summary.totalIncome) - parseFloat(summary.totalExpenses)).toFixed(2)}</p>
+                    <p className="total-amount">₹{(parseFloat(summary.totalIncome) + parseFloat(summary.totalExpenses)).toFixed(2)}</p>
                 </div>
             </div>
 
