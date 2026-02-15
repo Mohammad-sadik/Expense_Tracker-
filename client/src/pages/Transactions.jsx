@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import api from '../services/api';
 import { Button, Input, Card } from '../components/ui';
-import { Plus, Trash, Edit } from 'lucide-react';
+import { Plus, Trash, Edit, X } from 'lucide-react';
 import { useSearchParams } from 'react-router-dom';
 
 const Transactions = () => {
@@ -237,9 +237,14 @@ const Transactions = () => {
             {isModalOpen && (
                 <div className="modal-overlay">
                     <div className="modal-content">
-                        <h3 style={{ fontSize: '1.125rem', fontWeight: 600, marginBottom: '1rem', color: 'var(--text-color)' }}>
-                            {currentTransaction ? 'Edit Transaction' : 'Add Transaction'}
-                        </h3>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+                            <h3 style={{ fontSize: '1.125rem', fontWeight: 600, color: 'var(--text-color)', margin: 0 }}>
+                                {currentTransaction ? 'Edit Transaction' : 'Add Transaction'}
+                            </h3>
+                            <button onClick={() => setIsModalOpen(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-secondary)' }}>
+                                <X style={{ width: '1.5rem', height: '1.5rem' }} />
+                            </button>
+                        </div>
                         <form onSubmit={handleFormSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                             <Input
                                 label="Title"
@@ -254,12 +259,27 @@ const Transactions = () => {
                                 value={formData.amount}
                                 onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
                             />
-                            <Input
-                                label="Category"
-                                required
-                                value={formData.category}
-                                onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                            />
+                            <div className="input-group">
+                                <label className="input-label">Category</label>
+                                <select
+                                    className="input-field"
+                                    required
+                                    value={formData.category}
+                                    onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                                    style={{ fontFamily: 'inherit' }}
+                                >
+                                    <option value="">Select Category</option>
+                                    <option value="Basic Living">Basic Living</option>
+                                    <option value="Transport">Transport</option>
+                                    <option value="Shopping">Shopping</option>
+                                    <option value="Lifestyle">Lifestyle</option>
+                                    <option value="Health">Health</option>
+                                    <option value="Growth">Growth</option>
+                                    <option value="Work">Work</option>
+                                    <option value="Financial">Financial</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                            </div>
                             <Input
                                 label="Date"
                                 type="date"
