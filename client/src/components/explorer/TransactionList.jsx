@@ -1,6 +1,8 @@
 import React, { useContext, useState } from 'react';
 import { TransactionContext } from '../../context/TransactionContext';
 import TransactionForm from './TransactionForm';
+import SearchBar from './SearchBar';
+import { formatCurrency } from '../../utils';
 
 const TransactionList = () => {
     const {
@@ -8,12 +10,6 @@ const TransactionList = () => {
         loading,
         error,
         deleteTransaction,
-        searchTerm, setSearchTerm,
-        categoryFilter, setCategoryFilter,
-        startDate, setStartDate,
-        endDate, setEndDate,
-        minAmount, setMinAmount,
-        maxAmount, setMaxAmount,
         loadMore, hasMore
     } = useContext(TransactionContext);
 
@@ -40,7 +36,7 @@ const TransactionList = () => {
     };
 
     if (loading && transactions.length === 0) return <div>Loading transactions...</div>;
-    if (error) return <div className="error">{error}</div>;
+    if (error) return <div className="error-message">{error}</div>;
 
     return (
         <div className="transaction-list-container">
@@ -49,41 +45,7 @@ const TransactionList = () => {
                 <button className="btn-primary" onClick={handleAddNew}>+ Add New</button>
             </div>
 
-            <div className="filters-bar">
-                <input
-                    type="text"
-                    placeholder="Search title..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="filter-input"
-                />
-
-                <select
-                    value={categoryFilter}
-                    onChange={(e) => setCategoryFilter(e.target.value)}
-                    className="filter-input"
-                >
-                    <option value="All">All Categories</option>
-                    <option value="Income">Income</option>
-                    <option value="Food">Food</option>
-                    <option value="Transport">Transport</option>
-                    <option value="Entertainment">Entertainment</option>
-                    <option value="Utilities">Utilities</option>
-                    <option value="Health">Health</option>
-                    <option value="Other">Other</option>
-                </select>
-
-                <div className="filter-group">
-                    <input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} className="filter-input" />
-                    <span>to</span>
-                    <input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} className="filter-input" />
-                </div>
-
-                <div className="filter-group">
-                    <input type="number" placeholder="Min Amount" value={minAmount} onChange={(e) => setMinAmount(e.target.value)} className="filter-input" style={{ width: '100px' }} />
-                    <input type="number" placeholder="Max Amount" value={maxAmount} onChange={(e) => setMaxAmount(e.target.value)} className="filter-input" style={{ width: '100px' }} />
-                </div>
-            </div>
+            <SearchBar />
 
             <div className="transaction-list">
                 <div className="transaction-header">
@@ -104,7 +66,7 @@ const TransactionList = () => {
                         <div className="t-col t-title" title={t.title}>{t.title}</div>
                         <div className="t-col t-notes" title={t.notes}>{t.notes}</div>
                         <div className={`t-col t-amount ${t.category === 'Income' ? 'income-text' : 'expense-text'}`}>
-                            {t.category === 'Income' ? `+₹${t.amount.toFixed(2)}` : `-₹${Math.abs(t.amount).toFixed(2)}`}
+                            {t.category === 'Income' ? '+' : '-'}{formatCurrency(Math.abs(t.amount))}
                         </div>
                         <div className="t-col t-actions" style={{ textAlign: 'center' }}>
                             <button className="btn-icon edit" onClick={() => handleEdit(t)}>✎</button>

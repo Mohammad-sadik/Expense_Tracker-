@@ -1,6 +1,9 @@
 import React, { useState, useEffect, useContext } from 'react';
 import axios from 'axios';
 import { AuthContext } from '../context/AuthContext';
+import SummaryCards from '../components/dashboard/SummaryCards';
+import RecentTransactions from '../components/dashboard/RecentTransactions';
+import { formatCurrency } from '../utils';
 
 const Dashboard = () => {
     const { user } = useContext(AuthContext);
@@ -26,27 +29,14 @@ const Dashboard = () => {
     }, [user]);
 
     if (loading) return <div>Loading summary...</div>;
-    if (error) return <div className="error">{error}</div>;
+    if (error) return <div className="error-message">{error}</div>;
     if (!summary) return null;
 
     return (
         <div className="dashboard-page">
             <h2>Financial Summary</h2>
 
-            <div className="dashboard-summary-cards">
-                <div className="summary-card income">
-                    <h3>Total Income</h3>
-                    <p className="total-amount">₹{summary.totalIncome.toFixed(2)}</p>
-                </div>
-                <div className="summary-card expense">
-                    <h3>Total Expenses</h3>
-                    <p className="total-amount">₹{Math.abs(summary.totalExpenses).toFixed(2)}</p>
-                </div>
-                <div className="summary-card balance">
-                    <h3>Total Balance</h3>
-                    <p className="total-amount">₹{(summary.totalIncome + summary.totalExpenses).toFixed(2)}</p>
-                </div>
-            </div>
+            <SummaryCards summary={summary} />
 
             <div className="dashboard-grid">
                 <div className="category-section">
@@ -55,29 +45,13 @@ const Dashboard = () => {
                         {summary.categoryBreakdown.map((cat) => (
                             <div key={cat.category} className="category-card">
                                 <h4>{cat.category}</h4>
-                                <p>₹{Math.abs(parseFloat(cat.total)).toFixed(2)}</p>
+                                <p>{formatCurrency(Math.abs(parseFloat(cat.total)))}</p>
                             </div>
                         ))}
                     </div>
                 </div>
 
-                <div className="recent-section">
-                    <h3>Recent Transactions</h3>
-                    <div className="transaction-list">
-                        {summary.recentTransactions.map(t => (
-                            <div key={t.id} className="transaction-item compact">
-                                <div className="t-info">
-                                    <span className="t-date">{t.date}</span>
-                                    <span className="t-title">{t.title}</span>
-                                </div>
-                                <div className={`t-amount ${t.category === 'Income' ? 'income-text' : 'expense-text'}`}>
-                                    {t.category === 'Income' ? `+₹${t.amount.toFixed(2)}` : `-₹${Math.abs(t.amount).toFixed(2)}`}
-                                </div>
-                            </div>
-                        ))}
-                        {summary.recentTransactions.length === 0 && <p>No recent transactions.</p>}
-                    </div>
-                </div>
+                <RecentTransactions transactions={summary.recentTransactions} />
             </div>
         </div>
     );
