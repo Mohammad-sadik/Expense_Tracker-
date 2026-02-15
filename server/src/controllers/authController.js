@@ -10,7 +10,7 @@ const register = async (req, res) => {
     }
 
     try {
-        const existingUser = UserModel.findByEmail(email);
+        const existingUser = await UserModel.findByEmail(email);
         if (existingUser) {
             return res.status(400).json({ message: 'User already exists' });
         }
@@ -18,7 +18,7 @@ const register = async (req, res) => {
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, salt);
 
-        const newUser = UserModel.create({
+        const newUser = await UserModel.create({
             name,
             email,
             password: hashedPassword
@@ -48,7 +48,7 @@ const login = async (req, res) => {
     }
 
     try {
-        const user = UserModel.findByEmail(email);
+        const user = await UserModel.findByEmail(email);
         if (!user) {
             return res.status(400).json({ message: 'Invalid credentials' });
         }
@@ -76,7 +76,7 @@ const login = async (req, res) => {
 
 const getProfile = async (req, res) => {
     try {
-        const user = UserModel.findById(req.user.id);
+        const user = await UserModel.findById(req.user.id);
         if (!user) {
             return res.status(404).json({ message: 'User not found' });
         }

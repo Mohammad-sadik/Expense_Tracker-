@@ -1,6 +1,6 @@
 const TransactionModel = require('../models/transactionModel');
 
-const createTransaction = (req, res) => {
+const createTransaction = async (req, res) => {
     const { title, amount, category, date, notes } = req.body;
     const user_id = req.user.id;
 
@@ -9,7 +9,7 @@ const createTransaction = (req, res) => {
     }
 
     try {
-        const newTransaction = TransactionModel.create({
+        const newTransaction = await TransactionModel.create({
             user_id,
             title,
             amount: parseFloat(amount),
@@ -24,7 +24,7 @@ const createTransaction = (req, res) => {
     }
 };
 
-const getTransactions = (req, res) => {
+const getTransactions = async (req, res) => {
     const user_id = req.user.id;
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
@@ -36,7 +36,7 @@ const getTransactions = (req, res) => {
     const endDate = req.query.endDate;
 
     try {
-        const result = TransactionModel.findAll({
+        const result = await TransactionModel.findAll({
             userId: user_id,
             page,
             limit,
@@ -54,12 +54,12 @@ const getTransactions = (req, res) => {
     }
 };
 
-const getTransactionById = (req, res) => {
+const getTransactionById = async (req, res) => {
     const user_id = req.user.id;
     const id = req.params.id;
 
     try {
-        const transaction = TransactionModel.findById(id, user_id);
+        const transaction = await TransactionModel.findById(id, user_id);
         if (!transaction) {
             return res.status(404).json({ message: 'Transaction not found' });
         }
@@ -70,7 +70,7 @@ const getTransactionById = (req, res) => {
     }
 };
 
-const updateTransaction = (req, res) => {
+const updateTransaction = async (req, res) => {
     const user_id = req.user.id;
     const id = req.params.id;
     const { title, amount, category, date, notes } = req.body;
@@ -80,7 +80,7 @@ const updateTransaction = (req, res) => {
     }
 
     try {
-        const updated = TransactionModel.update(id, user_id, {
+        const updated = await TransactionModel.update(id, user_id, {
             title,
             amount: parseFloat(amount),
             category,
@@ -99,12 +99,12 @@ const updateTransaction = (req, res) => {
     }
 };
 
-const deleteTransaction = (req, res) => {
+const deleteTransaction = async (req, res) => {
     const user_id = req.user.id;
     const id = req.params.id;
 
     try {
-        const deleted = TransactionModel.delete(id, user_id);
+        const deleted = await TransactionModel.delete(id, user_id);
         if (!deleted) {
             return res.status(404).json({ message: 'Transaction not found or unauthorized' });
         }
@@ -115,10 +115,10 @@ const deleteTransaction = (req, res) => {
     }
 };
 
-const getDashboardData = (req, res) => {
+const getDashboardData = async (req, res) => {
     const user_id = req.user.id;
     try {
-        const data = TransactionModel.getDashboardData(user_id);
+        const data = await TransactionModel.getDashboardData(user_id);
         res.json(data);
     } catch (err) {
         console.error(err);

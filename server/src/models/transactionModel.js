@@ -1,29 +1,31 @@
-const { db } = require('../database');
+const { query } = require('../database');
 
 const TransactionModel = {
-    create: (transaction) => {
-        const stmt = db.prepare(`
-      INSERT INTO transactions (user_id, title, amount, category, date, notes)
-      VALUES (?, ?, ?, ?, ?, ?)
-    `);
-        const info = stmt.run(
+    create: async (transaction) => {
+        const text = `
+            INSERT INTO transactions (user_id, title, amount, category, date, notes)
+            VALUES ($1, $2, $3, $4, $5, $6)
+            RETURNING *
+        `;
+        const values = [
             transaction.user_id,
             transaction.title,
             transaction.amount,
             transaction.category,
             transaction.date,
             transaction.notes
-        );
-        return { id: info.lastInsertRowid, ...transaction };
+        ];
+        const res = await query(text, values);
+        return res.rows[0];
     },
 
-    update: (id, userId, updates) => {
-        const stmt = db.prepare(`
-      UPDATE transactions
-      SET title = ?, amount = ?, category = ?, date = ?, notes = ?
-      WHERE id = ? AND user_id = ?
-    `);
-        const info = stmt.run(
+    update: async (id, userId, updates) => {
+        const text = `
+            UPDATE transactions
+            SET title = $1, amount = $2, category = $3, date = $4, notes = $5
+            WHERE id = $6 AND user_id = $7
+        `;
+        const values = [
             updates.title,
             updates.amount,
             updates.category,
@@ -31,94 +33,107 @@ const TransactionModel = {
             updates.notes,
             id,
             userId
-        );
-        return info.changes > 0;
+        ];
+        const res = await query(text, values);
+        return res.rowCount > 0;
     },
 
-    delete: (id, userId) => {
-        const stmt = db.prepare('DELETE FROM transactions WHERE id = ? AND user_id = ?');
-        const info = stmt.run(id, userId);
-        return info.changes > 0;
+    delete: async (id, userId) => {
+        const text = 'DELETE FROM transactions WHERE id = $1 AND user_id = $2';
+        const res = await query(text, [id, userId]);
+        return res.rowCount > 0;
     },
 
-    findById: (id, userId) => {
-        const stmt = db.prepare('SELECT * FROM transactions WHERE id = ? AND user_id = ?');
-        return stmt.get(id, userId);
+    findById: async (id, userId) => {
+        const text = 'SELECT * FROM transactions WHERE id = $1 AND user_id = $2';
+        const res = await query(text, [id, userId]);
+        return res.rows[0];
     },
 
-    findAll: ({ userId, page, limit, search, category, minAmount, maxAmount, startDate, endDate }) => {
-        let sql = 'SELECT * FROM transactions WHERE user_id = ?';
+    findAll: async ({ userId, page = 1, limit = 10, search, category, minAmount, maxAmount, startDate, endDate }) => {
+        let sql = 'SELECT * FROM transactions WHERE user_id = $1';
         const params = [userId];
+        let paramIndex = 2; // Start from $2
 
         if (search) {
-            sql += ' AND (title LIKE ? OR notes LIKE ?)';
+            sql += ` AND (title ILIKE $${paramIndex} OR notes ILIKE $${paramIndex + 1})`;
             params.push(`%${search}%`, `%${search}%`);
+            paramIndex += 2;
         }
 
         if (category) {
-            sql += ' AND category = ?';
+            sql += ` AND category = $${paramIndex}`;
             params.push(category);
+            paramIndex++;
         }
 
         if (minAmount) {
-            sql += ' AND amount >= ?';
+            sql += ` AND amount >= $${paramIndex}`;
             params.push(minAmount);
+            paramIndex++;
         }
 
         if (maxAmount) {
-            sql += ' AND amount <= ?';
+            sql += ` AND amount <= $${paramIndex}`;
             params.push(maxAmount);
+            paramIndex++;
         }
 
         if (startDate) {
-            sql += ' AND date >= ?';
+            sql += ` AND date >= $${paramIndex}`;
             params.push(startDate);
+            paramIndex++;
         }
 
         if (endDate) {
-            sql += ' AND date <= ?';
+            sql += ` AND date <= $${paramIndex}`;
             params.push(endDate);
+            paramIndex++;
         }
 
-        // Count total required for pagination
-        const countStmt = db.prepare(sql.replace('SELECT *', 'SELECT COUNT(*) as count'));
-        const totalResult = countStmt.get(...params);
-        const total = totalResult.count;
+        // Count total for pagination (separate query)
+        // We need to reconstruct the WHERE clause for count, but without pagination
+        const countSql = `SELECT COUNT(*) as count ${sql.substring(sql.indexOf('FROM'))}`;
+        const countRes = await query(countSql, params);
+        const total = parseInt(countRes.rows[0].count);
 
         // Add ordering and pagination
-        sql += ' ORDER BY date DESC, id DESC LIMIT ? OFFSET ?';
+        sql += ` ORDER BY date DESC, id DESC LIMIT $${paramIndex} OFFSET $${paramIndex + 1}`;
         params.push(limit, (page - 1) * limit);
 
-        const stmt = db.prepare(sql);
-        const data = stmt.all(...params);
+        const res = await query(sql, params);
 
-        return { data, total, page, limit, totalPages: Math.ceil(total / limit) };
+        return { data: res.rows, total, page, limit, totalPages: Math.ceil(total / limit) };
     },
 
-    getDashboardData: (userId) => {
+    getDashboardData: async (userId) => {
         // Total expenses
-        const totalStmt = db.prepare('SELECT SUM(amount) as total FROM transactions WHERE user_id = ?');
-        const total = totalStmt.get(userId).total || 0;
+        const totalRes = await query('SELECT SUM(amount) as total FROM transactions WHERE user_id = $1', [userId]);
+        const total = parseFloat(totalRes.rows[0].total || 0);
 
         // Category breakdown
-        const categoryStmt = db.prepare(`
-      SELECT category, SUM(amount) as total
-      FROM transactions
-      WHERE user_id = ?
-      GROUP BY category
-    `);
-        const breakdown = categoryStmt.all(userId);
+        const categoryRes = await query(`
+            SELECT category, SUM(amount) as total
+            FROM transactions
+            WHERE user_id = $1
+            GROUP BY category
+        `, [userId]);
+
+        // Explicitly convert total to float because Postgres SUM returns string for decimals
+        const breakdown = categoryRes.rows.map(row => ({
+            category: row.category,
+            total: parseFloat(row.total)
+        }));
 
         // Recent transactions
-        const recentStmt = db.prepare(`
-      SELECT * FROM transactions
-      WHERE user_id = ?
-      ORDER BY date DESC, id DESC
-      LIMIT 5
-    `);
-        const recent = recentStmt.all(userId);
+        const recentRes = await query(`
+            SELECT * FROM transactions
+            WHERE user_id = $1
+            ORDER BY date DESC, id DESC
+            LIMIT 5
+        `, [userId]);
 
-        return { total, breakdown, recent };
+        return { total, breakdown, recent: recentRes.rows };
     }
 };
 

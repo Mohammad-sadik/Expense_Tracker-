@@ -1,46 +1,49 @@
-const Database = require('better-sqlite3');
-const path = require('path');
-const fs = require('fs');
+const { Pool } = require('pg');
+require('dotenv').config();
 
-// Ensure the data directory exists
-const dataDir = path.join(__dirname, '../data');
-if (!fs.existsSync(dataDir)) {
-    fs.mkdirSync(dataDir);
-}
+const isProduction = process.env.NODE_ENV === 'production';
 
-const dbPath = path.join(dataDir, 'expense.db');
-const db = new Database(dbPath, { verbose: console.log });
-db.pragma('journal_mode = WAL');
+const pool = new Pool({
+  connectionString: process.env.POSTGRES_URL, // Vercel provides this
+  ssl: {
+    rejectUnauthorized: false
+  }
+});
+
+// Helper to query database
+const query = (text, params) => pool.query(text, params);
 
 // Initialize Schema
-function initDb() {
-    const createUsersTable = `
-    CREATE TABLE IF NOT EXISTS users (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      name TEXT NOT NULL,
-      email TEXT UNIQUE NOT NULL,
-      password TEXT NOT NULL,
-      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-    );
-  `;
+const initDb = async () => {
+  try {
+    await query(`
+            CREATE TABLE IF NOT EXISTS users (
+                id SERIAL PRIMARY KEY,
+                name TEXT NOT NULL,
+                email TEXT UNIQUE NOT NULL,
+                password TEXT NOT NULL,
+                created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
+            );
+        `);
 
-    const createTransactionsTable = `
-    CREATE TABLE IF NOT EXISTS transactions (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      user_id INTEGER NOT NULL,
-      title TEXT NOT NULL,
-      amount REAL NOT NULL,
-      category TEXT NOT NULL,
-      date TEXT NOT NULL,
-      notes TEXT,
-      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-      FOREIGN KEY(user_id) REFERENCES users(id)
-    );
-  `;
+    await query(`
+            CREATE TABLE IF NOT EXISTS transactions (
+                id SERIAL PRIMARY KEY,
+                user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+                title TEXT NOT NULL,
+                amount DECIMAL(10, 2) NOT NULL,
+                category TEXT NOT NULL,
+                date DATE NOT NULL,
+                notes TEXT,
+                created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
+            );
+        `);
 
-    db.exec(createUsersTable);
-    db.exec(createTransactionsTable);
     console.log('Database initialized successfully.');
-}
+  } catch (err) {
+    console.error('Error initializing database:', err);
+    throw err;
+  }
+};
 
-module.exports = { db, initDb };
+module.exports = { query, initDb, pool };
