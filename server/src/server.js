@@ -1,9 +1,10 @@
-require('dotenv').config();
+const path = require('path');
+require('dotenv').config({ path: path.join(__dirname, '../.env') });
 const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
 const morgan = require('morgan');
-const path = require('path');
+
 const { initDb } = require('./database');
 const authRoutes = require('./routes/authRoutes');
 const transactionRoutes = require('./routes/transactionRoutes');
@@ -27,8 +28,6 @@ app.use('/api/transactions', transactionRoutes);
 // Serve static files from the React app
 app.use(express.static(path.join(__dirname, '../../client/dist')));
 
-// The "catchall" handler: for any request that doesn't
-// match one above, send back React's index.html file.
 // The "catchall" handler: for any request that doesn't
 // match one above, send back React's index.html file.
 app.get(/(.*)/, (req, res) => {
