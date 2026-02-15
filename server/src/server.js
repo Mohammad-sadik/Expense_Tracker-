@@ -24,9 +24,10 @@ app.use(morgan('dev'));
 app.use(express.json());
 
 // Check for critical environment variables
+// Check for critical environment variables with fallback
 if (!process.env.JWT_SECRET) {
-    console.error('FATAL ERROR: JWT_SECRET is not defined in environment variables.');
-    process.exit(1);
+    console.warn('WARNING: JWT_SECRET is not defined. Using insecure fallback secret for development/demo purposes.');
+    process.env.JWT_SECRET = 'fallback_insecure_secret_key_12345';
 }
 
 // Initialize Database
