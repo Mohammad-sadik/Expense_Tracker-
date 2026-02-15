@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import api from '../services/api';
 import { Button, Input, Card } from '../components/ui';
-import { Plus, Trash, Edit, X } from 'lucide-react';
+import { Plus, Trash, Edit, X, Eye } from 'lucide-react';
 import { useSearchParams } from 'react-router-dom';
 
 const Transactions = () => {
@@ -30,6 +30,7 @@ const Transactions = () => {
         date: new Date().toISOString().split('T')[0],
         notes: ''
     });
+    const [viewNote, setViewNote] = useState(null); // State for viewing note
 
     const fetchTransactions = async () => {
         setLoading(true);
@@ -196,6 +197,7 @@ const Transactions = () => {
                                 <th>Amount</th>
                                 <th>Category</th>
                                 <th>Date</th>
+                                <th style={{ textAlign: 'center' }}>Note</th>
                                 <th style={{ textAlign: 'right' }}>Actions</th>
                             </tr>
                         </thead>
@@ -211,6 +213,15 @@ const Transactions = () => {
                                         <td style={{ color: 'var(--text-secondary)' }}>₹{t.amount}</td>
                                         <td style={{ color: 'var(--text-secondary)' }}>{t.category}</td>
                                         <td style={{ color: 'var(--text-secondary)' }}>{t.date}</td>
+                                        <td style={{ textAlign: 'center' }}>
+                                            <button
+                                                onClick={() => setViewNote(t.notes || 'No notes added.')}
+                                                style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--primary)' }}
+                                                title="View Note"
+                                            >
+                                                <Eye style={{ width: '1rem', height: '1rem' }} />
+                                            </button>
+                                        </td>
                                         <td style={{ textAlign: 'right' }}>
                                             <button onClick={() => openModal(t)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--primary)', marginRight: '1rem' }}>
                                                 <Edit style={{ width: '1rem', height: '1rem' }} />
@@ -323,6 +334,29 @@ const Transactions = () => {
                     </div>
                 </div>
             )}
+
+            {/* View Note Modal */}
+            {viewNote !== null && (
+                <div className="modal-overlay" onClick={() => setViewNote(null)}>
+                    <div className="modal-content" style={{ maxWidth: '24rem' }} onClick={e => e.stopPropagation()}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+                            <h3 style={{ fontSize: '1.125rem', fontWeight: 600, color: 'var(--text-color)', margin: 0 }}>
+                                Transaction Note
+                            </h3>
+                            <button onClick={() => setViewNote(null)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-secondary)' }}>
+                                <X style={{ width: '1.5rem', height: '1.5rem' }} />
+                            </button>
+                        </div>
+                        <p style={{ color: 'var(--text-secondary)', whiteSpace: 'pre-wrap', lineHeight: 1.5 }}>
+                            {viewNote}
+                        </p>
+                        <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '1.5rem' }}>
+                            <Button onClick={() => setViewNote(null)} style={{ width: 'auto' }}>Close</Button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
         </div>
     );
 };
