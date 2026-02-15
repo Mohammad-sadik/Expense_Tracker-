@@ -1,5 +1,10 @@
 const path = require('path');
+// Load env vars. Default location first.
 require('dotenv').config();
+// Fallback: try loading from server/.env relative to this file if not found
+if (!process.env.JWT_SECRET) {
+    require('dotenv').config({ path: path.join(__dirname, '../.env') });
+}
 const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
@@ -17,6 +22,12 @@ app.use(cors());
 app.use(helmet());
 app.use(morgan('dev'));
 app.use(express.json());
+
+// Check for critical environment variables
+if (!process.env.JWT_SECRET) {
+    console.error('FATAL ERROR: JWT_SECRET is not defined in environment variables.');
+    process.exit(1);
+}
 
 // Initialize Database
 initDb();
