@@ -47,18 +47,21 @@ const Transactions = () => {
 
     useEffect(() => {
         fetchTransactions();
-        // Update URL params
-        const currentSearchParams = new URLSearchParams(searchParams);
+    }, [filters, page]); // Only fetch when filters or page changes
+
+    // Separate effect for URL synchronization to avoid loops
+    useEffect(() => {
+        const currentSearchParams = new URLSearchParams();
         Object.keys(filters).forEach(key => {
             if (filters[key]) {
                 currentSearchParams.set(key, filters[key]);
-            } else {
-                currentSearchParams.delete(key);
             }
         });
-        currentSearchParams.set('page', page.toString());
+        if (page > 1) {
+            currentSearchParams.set('page', page.toString());
+        }
         setSearchParams(currentSearchParams);
-    }, [filters, page, searchParams, setSearchParams]);
+    }, [filters, page]);
 
     const handleFilterChange = (e) => {
         const { name, value } = e.target;

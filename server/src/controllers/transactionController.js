@@ -12,7 +12,7 @@ const createTransaction = (req, res) => {
         const newTransaction = TransactionModel.create({
             user_id,
             title,
-            amount,
+            amount: parseFloat(amount),
             category,
             date,
             notes
@@ -82,7 +82,7 @@ const updateTransaction = (req, res) => {
     try {
         const updated = TransactionModel.update(id, user_id, {
             title,
-            amount,
+            amount: parseFloat(amount),
             category,
             date,
             notes
